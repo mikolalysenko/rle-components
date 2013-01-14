@@ -1,0 +1,27 @@
+{
+  "name": "rle-topology",
+  "version": "0.0.0",
+  "description": "Topological operations on narrowband level sets",
+  "main": "components.js",
+  "dependencies": {
+    "rle-core": "~0.0.1",
+    "union-find": "~0.0.0"
+  },
+  "devDependencies": {},
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/mikolalysenko/rle-topology.git"
+  },
+  "keywords": [
+    "topology",
+    "level",
+    "set",
+    "connected",
+    "component",
+    "rle"
+  ],
+  "author": "Mikola Lysenko",
+  "license": "MIT",
+  "readmeFilename": "README.md",
+  "gitHead": "65211b1076b9eb215f9540f7fb0d912ecbc6463b"
+}
