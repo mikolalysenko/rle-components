@@ -1,0 +1,37 @@
+{
+  "name": "rle-components",
+  "version": "0.0.1",
+  "description": "Connected component labeling / extraction for narrowband level sets",
+  "main": "components.js",
+  "dependencies": {
+    "union-find": "~0.0",
+    "rle-core": "~0.0",
+    "rle-stencils": "~0.0",
+    "rle-repair": "~0.0"
+  },
+  "directories": {
+    "example": "example",
+    "test": "test"
+  },
+  "scripts": {
+    "test": "node test/test.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/mikolalysenko/rle-components.git"
+  },
+  "keywords": [
+    "connected",
+    "component",
+    "rle",
+    "narrowband",
+    "level",
+    "set",
+    "voxel",
+    "3d"
+  ],
+  "author": "Mikola Lysenko",
+  "license": "BSD",
+  "readmeFilename": "README.md",
+  "gitHead": "48cca7981a76f022a6465c51e1648f794e660c60"
+}
