@@ -1,26 +1,35 @@
-var UnionFind = require("union-find").UnionFind;
-var SURFACE_STENCIL = require("./surface.js").SURFACE_STENCIL;
-var createStencil = require("./stencil_iterator.js").createStencil;
-var misc = require("./misc.js");
-var CROSS_STENCIL = misc.CROSS_STENCIL;
-var volume = require("./volume.js");
-var Run = volume.Run
-  , Volume = volume.Volume;
+var UnionFind          = require("union-find");
+var core               = require("rle-core");
+var stencils           = require("rle-stencils");
+var repair             = require("rle-repair");
+var DEFAULT_SOLID_FUNC = new Function("p", "return !!p;");
+var DEFAULT_LINK_FUNC  = new Function("a", "b", "return true;");
 
 //Extracts all connected components of the volume
-function labelComponents(volume) {
+function label(volume, link_func, solid_func) {
+  if(!link_func) {
+    link_func = DEFAULT_LINK_FUNC;
+  }
+  if(!solid_func) {
+    solid_func = DEFAULT_SOLID_FUNC;
+  }
+  var len = volume.length();
+  
   //First assign labels
-  var runs   = volume.runs
-    , forest = new UnionFind(runs.length);
-  for(var iter=createStencil(volume, SURFACE_STENCIL); iter.hasNext(); iter.next()) {
-    if(runs[iter.ptrs[0]].value < 0) {
+  var forest = new UnionFind(len);
+  for(var iter=core.beginStencil(volume, stencils.CUBE_STENCIL); iter.hasNext(); iter.next()) {
+    var a = volume.phases[iter.ptrs[0]];
+    if(!solid_func(a)) {
       continue;
     }
     for(var i=1; i<8; ++i) {
-      if(runs[iter.ptrs[i]].value < 0) {
+      var b = volume.phases[iter.ptrs[i]];
+      if(!solid_func(b)) {
         continue;
       }
-      forest.link(iter.ptrs[0], iter.ptrs[i]);
+      if(link_func(a, b)) {
+        forest.link(iter.ptrs[0], iter.ptrs[i]);
+      }
     }
   }
   //Then mark components using labels
@@ -28,9 +37,8 @@ function labelComponents(volume) {
   var clabels          = forest.ranks
     , root2label       = []
     , component_count  = 0;
-  for(var i=0; i<runs.length(); ++i) {
-    var run = runs[i];
-    if(run.value < 0) {
+  for(var i=0; i<len; ++i) {
+    if(!solid_func(volume.phases[i])) {
       clabels[i] = -1;
       continue;
     }
@@ -48,49 +56,38 @@ function labelComponents(volume) {
     , labels: clabels
   }
 }
+exports.label = label;
 
-//Extracts all components.  label_struct is the result of running label_components
+//Extracts all components.  label_struct is the result of running labelComponents
 // and is reused if possible
-function splitComponents(volume, label_struct) {
+function split(volume, label_struct) {
   if(!label_struct) {
-    label_struct = this.labelComponents;
+    label_struct = label(volume);
   }
   var count       = label_struct.count
-    , labels      = label_struct.clabels
+    , labels      = label_struct.labels
     , components  = new Array(count);
   for(var i=0; i<count; ++i) {
-    components[i] = [ ];
+    components[i] = new core.DynamicVolume();
   }
-  var runs = volume.runs;
-  for(var iter=createStencil(volume, CROSS_STENCIL); iter.hasNext(); iter.next()) {
-    var ptrs    = iter.ptrs
-      , center  = runs[ptrs[0]];
-    if(center.value < 0) {
-      //Check each neighbor
+  for(var iter=core.beginStencil(volume, stencils.CROSS_STENCIL); iter.hasNext(); iter.next()) {
+    var idx = iter.ptrs[0];
+    var label = labels[idx];
+    var phase = volume.phases[idx];
+    var distance = volume.distances[idx];
+    if(label < 0) {
       for(var i=1; i<7; ++i) {
-        var neighbor = runs[ptrs[i]];
-        if(neighbor.value < 0) {
-          continue;
-        }
-        var id = labels[ptrs[i]]
-          , cc = components[id];
-        if(compareCoord(cc[cc.length-1].coord, center.coord) < 0) {
-          cc.push(new Run(center.coord.slice(0), center.value));
+        if(labels[iter.ptrs[i]] >= 0) {
+          components[labels[iter.ptrs[i]]].push(iter.coord[0], iter.coord[1], iter.coord[2], distance, 0);
         }
       }
     } else {
-      var id = labels[ptrs[0]]
-        , cc = components[id];
-      if(compareCoord(cc[cc.length-1].coord, center.coord) < 0) {
-        cc.push(new Run(center.coord.slice(0), center.value));
-      }
+      components[label].push(iter.coord[0], iter.coord[1], iter.coord[2], distance, phase);
     }
   }
-  //Convert components back into volumes
-  var volumes = new Array(count);
   for(var i=0; i<count; ++i) {
-    volumes[i] = new Volume(components[i]);
+    components[i] = repair.removeDuplicates(components[i]);
   }
-  return volumes;
+  return components;
 }
-
+exports.split = split;

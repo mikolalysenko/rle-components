@@ -1,11 +1,13 @@
 {
   "name": "rle-topology",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "Topological operations on narrowband level sets",
   "main": "components.js",
   "dependencies": {
-    "rle-core": "~0.0.1",
-    "union-find": "~0.0.0"
+    "union-find": "*",
+    "rle-core": "0.0.*",
+    "rle-stencils": "0.0.*",
+    "rle-repair": "0.0.*"
   },
   "devDependencies": {},
   "repository": {
