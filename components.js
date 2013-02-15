@@ -6,7 +6,7 @@ var DEFAULT_SOLID_FUNC = new Function("p", "return !!p;");
 var DEFAULT_LINK_FUNC  = new Function("a", "b", "return true;");
 
 //Extracts all connected components of the volume
-function label(volume, link_func, solid_func) {
+function labelConnectedComponents(volume, link_func, solid_func) {
   if(!link_func) {
     link_func = DEFAULT_LINK_FUNC;
   }
@@ -56,13 +56,13 @@ function label(volume, link_func, solid_func) {
     , labels: clabels
   }
 }
-exports.label = label;
+exports.label = labelConnectedComponents;
 
 //Extracts all components.  label_struct is the result of running labelComponents
 // and is reused if possible
-function split(volume, label_struct) {
+function splitConnectedComponents(volume, label_struct) {
   if(!label_struct) {
-    label_struct = label(volume);
+    label_struct = labelConnectedComponents(volume);
   }
   var count       = label_struct.count
     , labels      = label_struct.labels
@@ -90,4 +90,4 @@ function split(volume, label_struct) {
   }
   return components;
 }
-exports.split = split;
+exports.split = splitConnectedComponents;

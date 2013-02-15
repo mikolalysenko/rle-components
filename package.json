@@ -9,6 +9,13 @@
     "rle-stencils": "~0.0",
     "rle-repair": "~0.0"
   },
+  "devDependencies": {
+    "gl-shells": "~0.1",
+    "jquery-browserify": "*",
+    "rle-sample": "~0.0",
+    "rle-mesh": "~0.0",
+    "meshcat": "~0.0"
+  },
   "directories": {
     "example": "example",
     "test": "test"
