@@ -1,6 +1,6 @@
 {
   "name": "rle-components",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Connected component labeling / extraction for narrowband level sets",
   "main": "components.js",
   "dependencies": {
