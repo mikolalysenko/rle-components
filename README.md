@@ -25,7 +25,7 @@ Here is the result:
 
 <img src="https://raw.github.com/mikolalysenko/rle-components/master/images/components.png" width=40%>
 
-You can try out a [demo in your browser](http://mikolalysenko.github.com/rle-components/example/www/index.html).
+You can try out a [demo in your browser](http://mikolalysenko.github.io/rle-components/example/www/index.html).
 
 `require("rle-components").label(volume[, link_func, solid_func])`
 -----------------------------------------
